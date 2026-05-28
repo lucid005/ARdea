@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/AuthScreens.uss?fileID=7433441132597879392&amp;guid=1bb76049fc017044cbf7fc459711899a&amp;type=3#AuthScreens"/>
+    <ui:VisualElement name="root" class="auth-screen" style="height: 1920px;">
+        <ui:Button name="back-btn" text="‹" class="back-button"/>
+        <ui:Label text="OTP Verification" class="auth-title otp-title"/>
+        <ui:Label text="Enter the verification code we just sent on your&#10;email address." class="auth-copy otp-copy"/>
+        <ui:VisualElement class="otp-row">
+            <ui:TextField name="otp-1" value="" max-length="1" class="otp-box otp-box-empty"/>
+            <ui:TextField name="otp-2" value="" max-length="1" class="otp-box otp-box-empty"/>
+            <ui:TextField name="otp-3" value="" max-length="1" class="otp-box otp-box-empty"/>
+            <ui:TextField name="otp-4" max-length="1" class="otp-box otp-box-empty"/>
+        </ui:VisualElement>
+        <ui:Button name="verify-btn" text="Verify" class="auth-primary otp-button"/>
+        <ui:VisualElement class="auth-footer">
+            <ui:Label text="Didn&apos;t received code?" class="auth-footer-text"/>
+            <ui:Label name="resend-btn" text="Resend" class="auth-footer-link"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/AuthScreens.uss?fileID=7433441132597879392&amp;guid=1bb76049fc017044cbf7fc459711899a&amp;type=3#AuthScreens"/>
+    <ui:VisualElement name="root" class="auth-screen">
+        <ui:Button name="back-btn" text="&#8249;" class="back-button"/>
+        <ui:Label text="Hello! Register to get&#10;started" class="auth-title register-title"/>
+        <ui:VisualElement class="auth-field register-field-1">
+            <ui:TextField name="username-field" placeholder-text="Username" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="auth-field register-field-2">
+            <ui:TextField name="email-field" placeholder-text="Email" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="auth-field register-field-3">
+            <ui:TextField name="password-field" password="true" placeholder-text="Password" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="auth-field register-field-4">
+            <ui:TextField name="confirm-password-field" password="true" placeholder-text="Confirm password" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:Button name="register-btn" text="Register" class="auth-primary register-button"/>
+        <ui:VisualElement class="or-row register-or">
+            <ui:VisualElement class="or-line"/>
+            <ui:Label text="Or Register with" class="or-text"/>
+            <ui:VisualElement class="or-line"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="social-row register-social">
+            <ui:Button text="f" class="social-button facebook-button"/>
+            <ui:Button text="G" class="social-button google-button"/>
+            <ui:Button text="Apple" class="social-button apple-button"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="auth-footer register-footer">
+            <ui:Label text="Already have an account?" class="auth-footer-text"/>
+            <ui:Label name="login-btn" text="Login Now" class="auth-footer-link"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
