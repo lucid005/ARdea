@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/AR/ARDesigner.uss?fileID=7433441132597879392&amp;guid=96b331e824f74ec3b5c7d85a6ff77e18&amp;type=3#ARDesigner"/>
+    <ui:VisualElement name="root" class="ar-root" style="background-color: rgba(242, 242, 242, 0);">
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+        <ui:Button name="ar-back-btn" text="&lt;" class="round-button back-button"/>
+        <ui:Button name="delete-btn" text="D" class="round-button delete-button"/>
+        <ui:Button name="placed-list-btn" text="L" class="round-button placed-button"/>
+        <ui:Button name="save-project-btn" text="S" class="round-button save-button"/>
+        <ui:VisualElement name="selection-controls" class="selection-tools hidden">
+            <ui:Label name="selected-label" text="Selected" class="selected-label"/>
+            <ui:Button name="move-tool-btn" text="Move" class="tool-button tool-button-active"/>
+            <ui:Button name="rotate-tool-btn" text="Rotate" class="tool-button"/>
+            <ui:Button name="scale-tool-btn" text="Scale" class="tool-button"/>
+        </ui:VisualElement>
+        <ui:Button name="inventory-btn" text="+" class="inventory-button"/>
+        <ui:Label text="Inventory" class="inventory-label"/>
+        <ui:VisualElement name="inventory-sheet" class="sheet hidden">
+            <ui:VisualElement class="sheet-handle"/>
+            <ui:Label text="Inventory" class="sheet-title"/>
+            <ui:TextField name="inventory-search" placeholder-text="Search saved furniture" class="sheet-search"/>
+            <ui:VisualElement name="inventory-chip-row" class="sheet-chip-row"/>
+            <ui:Label text="Saved furniture" class="sheet-section-title"/>
+            <ui:ScrollView name="inventory-list" class="inventory-list"/>
+            <ui:Button name="browse-more-btn" text="Browse more furniture" class="browse-more"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="placed-panel" class="placed-panel hidden">
+            <ui:Label text="Placed Furniture" class="sheet-title"/>
+            <ui:ScrollView name="placed-list" class="placed-list"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

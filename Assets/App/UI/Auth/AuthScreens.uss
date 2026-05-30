@@ -1,0 +1,330 @@
+:root {
+    --ink: #111111;
+    --muted: #666666;
+    --subtle: #777777;
+    --soft: #f7f7f7;
+    --line: #e6e6e6;
+    --white: #ffffff;
+}
+
+.auth-screen {
+    width: 100%;
+    height: 100%;
+    background-color: var(--white);
+    -unity-font-definition: url("project://database/Assets/App/Fonts/inter/Inter_28pt-Regular.ttf?fileID=12800000&guid=ab50724340f7a4545b5ef41f0b8507f0&type=3#Inter_28pt-Regular");
+}
+
+.status-time {
+    display: none;
+    position: absolute;
+    top: 35px;
+    left: 80px;
+    color: var(--ink);
+    font-size: 28px;
+    -unity-font-style: bold;
+}
+
+.status-icons {
+    display: none;
+    position: absolute;
+    top: 38px;
+    right: 80px;
+    width: 220px;
+    color: var(--ink);
+    font-size: 23px;
+    -unity-font-style: bold;
+    -unity-text-align: upper-right;
+}
+
+.gesture-handle {
+    display: none;
+    position: absolute;
+    bottom: 36px;
+    left: 400px;
+    width: 280px;
+    height: 9px;
+    background-color: rgba(17, 17, 17, 0.18);
+    border-radius: 9px;
+}
+
+.brand-small {
+    position: absolute;
+    top: 149px;
+    left: 80px;
+    color: #777777;
+    font-size: 28px;
+    -unity-font-style: bold;
+}
+
+.welcome-title {
+    position: absolute;
+    top: 394px;
+    left: 80px;
+    width: 840px;
+    height: 190px;
+    color: var(--ink);
+    font-size: 62px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.welcome-subtitle {
+    position: absolute;
+    top: 618px;
+    left: 80px;
+    width: 880px;
+    height: 112px;
+    color: var(--muted);
+    font-size: 30px;
+    white-space: normal;
+}
+
+.preview-card {
+    position: absolute;
+    top: 820px;
+    left: 80px;
+    width: 920px;
+    height: 520px;
+    background-color: var(--soft);
+    border-width: 1px;
+    border-color: #e7e7e7;
+    border-radius: 24px;
+    padding: 34px;
+}
+
+.preview-plane {
+    width: 852px;
+    height: 250px;
+    background-color: #eeeeee;
+    border-radius: 18px;
+}
+
+.preview-label {
+    margin-top: 24px;
+    width: 768px;
+    color: var(--muted);
+    font-size: 30px;
+    -unity-font-style: bold;
+}
+
+.button-primary,
+.button-outline {
+    position: absolute;
+    left: 80px;
+    width: 920px;
+    height: 112px;
+    border-radius: 18px;
+    font-size: 31px;
+    -unity-font-style: bold;
+}
+
+.button-primary {
+    background-color: var(--ink);
+    border-width: 0;
+    color: var(--white);
+}
+
+.button-outline {
+    background-color: var(--white);
+    border-width: 1px;
+    border-color: #dddddd;
+    color: var(--ink);
+}
+
+.welcome-login { top: 1450px; }
+.welcome-register { top: 1598px; }
+
+.screen-title {
+    position: absolute;
+    left: 80px;
+    top: 158px;
+    width: 850px;
+    height: 66px;
+    color: var(--ink);
+    font-size: 50px;
+    -unity-font-style: bold;
+}
+
+.screen-subtitle {
+    position: absolute;
+    left: 80px;
+    top: 232px;
+    width: 900px;
+    height: 84px;
+    color: var(--muted);
+    font-size: 28px;
+    white-space: normal;
+}
+
+.back-button {
+    position: absolute;
+    top: 128px;
+    left: 64px;
+    width: 70px;
+    height: 70px;
+    background-color: var(--white);
+    border-width: 1px;
+    border-color: #e7e7e7;
+    border-radius: 35px;
+    color: var(--ink);
+    font-size: 38px;
+    padding-bottom: 8px;
+}
+
+.field-block {
+    position: absolute;
+    left: 80px;
+    width: 920px;
+    height: 150px;
+}
+
+.field-label {
+    color: #333333;
+    font-size: 24px;
+    -unity-font-style: bold;
+}
+
+.auth-input {
+    margin-top: 14px;
+    width: 920px;
+    height: 94px;
+    background-color: var(--soft);
+    border-width: 1px;
+    border-color: #e5e5e5;
+    border-radius: 16px;
+    color: var(--ink);
+    font-size: 29px;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+
+.auth-input > #unity-text-input {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: var(--ink);
+    font-size: 29px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.login-email { top: 402px; }
+.login-password { top: 596px; }
+.register-name { top: 402px; }
+.register-email { top: 592px; }
+.register-password { top: 782px; }
+.register-confirm { top: 972px; }
+.forgot-email { top: 488px; }
+.new-password { top: 488px; }
+.confirm-password { top: 678px; }
+
+.forgot-link {
+    position: absolute;
+    top: 786px;
+    right: 80px;
+    color: #555555;
+    font-size: 25px;
+    -unity-font-style: bold;
+}
+
+.login-primary { top: 866px; }
+.login-register { top: 1016px; }
+.register-primary { top: 1202px; }
+.register-login { top: 1350px; }
+.forgot-primary { top: 688px; }
+.forgot-login { top: 836px; }
+.new-password-primary { top: 898px; }
+.success-login { top: 1020px; }
+
+.offset-title { top: 244px; }
+.offset-subtitle { top: 318px; }
+
+.otp-row {
+    position: absolute;
+    top: 488px;
+    left: 80px;
+    width: 920px;
+    height: 108px;
+    flex-direction: row;
+}
+
+.otp-box {
+    width: 128px;
+    height: 108px;
+    margin-right: 26px;
+    background-color: var(--white);
+    border-width: 1px;
+    border-color: #dddddd;
+    border-radius: 18px;
+    color: var(--ink);
+    font-size: 34px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.otp-button { top: 688px; }
+
+.resend-text {
+    position: absolute;
+    top: 848px;
+    left: 80px;
+    width: 920px;
+    color: #555555;
+    font-size: 28px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.success-mark {
+    position: absolute;
+    top: 444px;
+    left: 456px;
+    width: 168px;
+    height: 168px;
+    background-color: #111111;
+    border-radius: 84px;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-check {
+    color: var(--white);
+    font-size: 70px;
+    -unity-font-style: bold;
+}
+
+.success-title {
+    position: absolute;
+    top: 690px;
+    left: 80px;
+    width: 920px;
+    height: 80px;
+    color: var(--ink);
+    font-size: 50px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.success-subtitle {
+    position: absolute;
+    top: 790px;
+    left: 130px;
+    width: 820px;
+    height: 100px;
+    color: var(--muted);
+    font-size: 28px;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+.error-label {
+    position: absolute;
+    top: 822px;
+    left: 80px;
+    width: 920px;
+    color: #d94a4a;
+    font-size: 24px;
+}
+
+.hidden {
+    display: none;
+}

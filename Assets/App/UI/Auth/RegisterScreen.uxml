@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/Auth/AuthScreens.uss?fileID=7433441132597879392&amp;guid=1bb76049fc017044cbf7fc459711899a&amp;type=3#AuthScreens"/>
+    <ui:VisualElement name="root" class="auth-screen">
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+        <ui:Label text="Create account" class="screen-title"/>
+        <ui:Label text="Start saving furniture and project layouts to your ARdea account." class="screen-subtitle"/>
+        <ui:VisualElement class="field-block register-name">
+            <ui:Label text="Full name" class="field-label"/>
+            <ui:TextField name="username-field" placeholder-text="Enter your full name" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="field-block register-email">
+            <ui:Label text="Email address" class="field-label"/>
+            <ui:TextField name="email-field" placeholder-text="Enter your email" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="field-block register-password">
+            <ui:Label text="Password" class="field-label"/>
+            <ui:TextField name="password-field" password="true" placeholder-text="Create password" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="field-block register-confirm">
+            <ui:Label text="Confirm password" class="field-label"/>
+            <ui:TextField name="confirm-password-field" password="true" placeholder-text="Confirm password" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:Button name="register-btn" text="Register" class="button-primary register-primary"/>
+        <ui:Label name="login-btn" text="Already have an account? Sign in" class="button-outline register-login"/>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/Auth/AuthScreens.uss?fileID=7433441132597879392&amp;guid=1bb76049fc017044cbf7fc459711899a&amp;type=3#AuthScreens"/>
+    <ui:VisualElement name="root" class="auth-screen">
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+        <ui:Label text="ARdea" class="brand-small"/>
+        <ui:Label text="Design rooms before you move anything." class="welcome-title"/>
+        <ui:Label text="Browse furniture, create projects, and place saved pieces in your real space with AR." class="welcome-subtitle"/>
+        <ui:VisualElement class="preview-card">
+            <ui:VisualElement class="preview-plane"/>
+            <ui:Label text="Minimal AR room planning preview" class="preview-label"/>
+        </ui:VisualElement>
+        <ui:Button name="login-btn" text="Login" class="button-primary welcome-login"/>
+        <ui:Button name="register-btn" text="Create account" class="button-outline welcome-register"/>
+    </ui:VisualElement>
+</ui:UXML>

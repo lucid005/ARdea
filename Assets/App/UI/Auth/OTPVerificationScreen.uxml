@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/Auth/AuthScreens.uss?fileID=7433441132597879392&amp;guid=1bb76049fc017044cbf7fc459711899a&amp;type=3#AuthScreens"/>
+    <ui:VisualElement name="root" class="auth-screen">
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+        <ui:Button name="back-btn" text="&#8249;" class="back-button"/>
+        <ui:Label text="OTP Verification" class="screen-title offset-title"/>
+        <ui:Label text="Enter the verification code we just sent to your email address." class="screen-subtitle offset-subtitle"/>
+        <ui:VisualElement class="otp-row">
+            <ui:TextField name="otp-1" max-length="1" class="otp-box"/>
+            <ui:TextField name="otp-2" max-length="1" class="otp-box"/>
+            <ui:TextField name="otp-3" max-length="1" class="otp-box"/>
+            <ui:TextField name="otp-4" max-length="1" class="otp-box"/>
+            <ui:TextField name="otp-5" max-length="1" class="otp-box"/>
+            <ui:TextField name="otp-6" max-length="1" class="otp-box"/>
+        </ui:VisualElement>
+        <ui:Button name="verify-btn" text="Verify" class="button-primary otp-button"/>
+        <ui:Label name="resend-btn" text="Didn't receive code? Resend" class="resend-text"/>
+    </ui:VisualElement>
+</ui:UXML>

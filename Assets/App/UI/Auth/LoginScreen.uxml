@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/Auth/AuthScreens.uss?fileID=7433441132597879392&amp;guid=1bb76049fc017044cbf7fc459711899a&amp;type=3#AuthScreens"/>
+    <ui:VisualElement name="root" class="auth-screen">
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+        <ui:Label text="Welcome back" class="screen-title"/>
+        <ui:Label text="Sign in to save projects, sync furniture, and continue designing." class="screen-subtitle"/>
+        <ui:VisualElement class="field-block login-email">
+            <ui:Label text="Email address" class="field-label"/>
+            <ui:TextField name="email-field" placeholder-text="Enter your email" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="field-block login-password">
+            <ui:Label text="Password" class="field-label"/>
+            <ui:TextField name="password-field" password="true" placeholder-text="Password" class="auth-input"/>
+        </ui:VisualElement>
+        <ui:Label name="forgot-btn" text="Forgot password?" class="forgot-link"/>
+        <ui:Label name="error-label" text="" class="error-label hidden"/>
+        <ui:Button name="signin-btn" text="Sign in" class="button-primary login-primary"/>
+        <ui:Button name="register-btn" text="Create account" class="button-outline login-register"/>
+        <ui:Button name="guest-btn" text="Continue as guest" class="hidden"/>
+    </ui:VisualElement>
+</ui:UXML>

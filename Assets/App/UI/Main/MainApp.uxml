@@ -1,0 +1,186 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/App/UI/Main/MainApp.uss?fileID=7433441132597879392&amp;guid=3ec4f527f1a3473e9b0b8b97f822e6c1&amp;type=3#MainApp"/>
+    <ui:VisualElement name="root" class="app-root">
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+
+        <ui:VisualElement name="home-page" class="page page-active home-page">
+            <ui:Label text="ARdea" class="brand-small"/>
+            <ui:Label text="Your projects" class="screen-title home-title"/>
+            <ui:Button name="settings-btn" text="A" class="profile-avatar-button"/>
+            <ui:Button name="add-project-btn" text="Create new project   +" class="button-primary create-project-button"/>
+
+            <ui:Label text="Recent rooms" class="section-heading recent-heading"/>
+            <ui:Label text="View all" class="section-link view-all-link"/>
+            <ui:ScrollView name="project-list" class="project-list"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="browse-page" class="page hidden browse-page">
+            <ui:Label name="browse-title-label" text="Browse Furniture" class="screen-title"/>
+            <ui:Label name="browse-subtitle-label" text="Save furniture you like, then place it inside your AR room." class="screen-subtitle"/>
+            <ui:VisualElement class="field-block search-block">
+                <ui:Label text="Search" class="field-label"/>
+                <ui:TextField name="search-field" placeholder-text="Search furniture" class="main-input"/>
+            </ui:VisualElement>
+            <ui:ScrollView name="category-row" class="category-row" mode="Horizontal"/>
+            <ui:ScrollView name="furniture-list" class="furniture-grid"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="profile-page" class="page hidden profile-page">
+            <ui:Label text="Profile" class="screen-title"/>
+            <ui:Label text="Manage account, saved furniture, and app preferences." class="screen-subtitle"/>
+            <ui:VisualElement class="profile-header">
+                <ui:VisualElement class="avatar-large">
+                    <ui:Label text="A" class="avatar-large-text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="profile-copy">
+                    <ui:Label name="profile-name-label" text="ARdea User" class="profile-name"/>
+                    <ui:Label name="profile-email-label" text="name@example.com" class="profile-email"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="profile-stats">
+                <ui:VisualElement class="profile-stat">
+                    <ui:Label name="profile-project-count-label" text="3" class="profile-stat-value"/>
+                    <ui:Label text="Projects" class="profile-stat-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="profile-stat">
+                    <ui:Label name="profile-saved-count-label" text="13" class="profile-stat-value"/>
+                    <ui:Label text="Saved" class="profile-stat-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="profile-stat">
+                    <ui:Label text="9" class="profile-stat-value"/>
+                    <ui:Label text="Placed" class="profile-stat-label"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="profile-saved-btn" class="profile-list-item">
+                <ui:VisualElement class="profile-list-copy">
+                    <ui:Label text="Saved furniture" class="profile-list-title"/>
+                    <ui:Label text="Furniture saved for AR placement" class="profile-list-subtitle"/>
+                </ui:VisualElement>
+                <ui:Label text="&gt;" class="profile-list-chevron"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="profile-projects-btn" class="profile-list-item">
+                <ui:VisualElement class="profile-list-copy">
+                    <ui:Label text="My projects" class="profile-list-title"/>
+                    <ui:Label text="All created interior projects" class="profile-list-subtitle"/>
+                </ui:VisualElement>
+                <ui:Label text="&gt;" class="profile-list-chevron"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="profile-settings-btn" class="profile-list-item">
+                <ui:VisualElement class="profile-list-copy">
+                    <ui:Label text="Settings" class="profile-list-title"/>
+                    <ui:Label text="App and account settings" class="profile-list-subtitle"/>
+                </ui:VisualElement>
+                <ui:Label text="&gt;" class="profile-list-chevron"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="profile-help-btn" class="profile-list-item">
+                <ui:VisualElement class="profile-list-copy">
+                    <ui:Label text="Help" class="profile-list-title"/>
+                    <ui:Label text="Gesture and AR placement guide" class="profile-list-subtitle"/>
+                </ui:VisualElement>
+                <ui:Label text="&gt;" class="profile-list-chevron"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-page" class="page hidden settings-page">
+            <ui:Button name="settings-back-btn" text="&lt;" class="back-button"/>
+            <ui:Label text="Settings" class="screen-title settings-title"/>
+            <ui:Label text="Update preferences for your account and AR workspace." class="screen-subtitle settings-subtitle"/>
+            <ui:VisualElement class="settings-list">
+                <ui:VisualElement class="settings-list-item">
+                    <ui:VisualElement class="settings-list-copy">
+                        <ui:Label text="Account" class="settings-list-title"/>
+                        <ui:Label text="Name, email and password" class="settings-list-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:Label text="&gt;" class="settings-list-chevron"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-list-item">
+                    <ui:VisualElement class="settings-list-copy">
+                        <ui:Label text="Notifications" class="settings-list-title"/>
+                        <ui:Label text="Project reminders and app updates" class="settings-list-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:Label text="&gt;" class="settings-list-chevron"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-list-item">
+                    <ui:VisualElement class="settings-list-copy">
+                        <ui:Label text="AR preferences" class="settings-list-title"/>
+                        <ui:Label text="Plane guides and object controls" class="settings-list-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:Label text="&gt;" class="settings-list-chevron"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-list-item">
+                    <ui:VisualElement class="settings-list-copy">
+                        <ui:Label text="Units" class="settings-list-title"/>
+                        <ui:Label text="Centimeters" class="settings-list-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:Label text="&gt;" class="settings-list-chevron"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-list-item">
+                    <ui:VisualElement class="settings-list-copy">
+                        <ui:Label text="Privacy" class="settings-list-title"/>
+                        <ui:Label text="Data and saved projects" class="settings-list-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:Label text="&gt;" class="settings-list-chevron"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-list-item">
+                    <ui:VisualElement class="settings-list-copy">
+                        <ui:Label text="About ARdea" class="settings-list-title"/>
+                        <ui:Label text="Version 1.0" class="settings-list-subtitle"/>
+                    </ui:VisualElement>
+                    <ui:Label text="&gt;" class="settings-list-chevron"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="signout-btn" text="Log out" class="button-outline settings-logout"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="saved-profile-page" class="page hidden profile-detail-page">
+            <ui:Button name="saved-profile-back-btn" text="&lt;" class="back-button"/>
+            <ui:Label text="Saved furniture" class="screen-title detail-title"/>
+            <ui:Label text="Furniture saved for placement inside your AR projects." class="screen-subtitle detail-subtitle"/>
+            <ui:ScrollView name="saved-profile-list" class="profile-detail-list"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="projects-profile-page" class="page hidden profile-detail-page">
+            <ui:Button name="projects-profile-back-btn" text="&lt;" class="back-button"/>
+            <ui:Label text="My projects" class="screen-title detail-title"/>
+            <ui:Label text="All rooms created in your ARdea workspace." class="screen-subtitle detail-subtitle"/>
+            <ui:ScrollView name="projects-profile-list" class="profile-detail-list"/>
+        </ui:VisualElement>
+
+        <ui:Label text="9:41" class="status-time"/>
+        <ui:Label text="LTE  86%" class="status-icons"/>
+        <ui:VisualElement class="gesture-handle"/>
+
+        <ui:VisualElement name="main-bottom-nav" class="bottom-nav">
+            <ui:Button name="nav-home" text="^&#10;Home" class="nav-item nav-active"/>
+            <ui:Button name="nav-browse" text="[]&#10;Browse" class="nav-item"/>
+            <ui:Button name="nav-profile" text="o&#10;Profile" class="nav-item"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="confirm-dialog" class="confirm-overlay hidden">
+            <ui:VisualElement class="confirm-card">
+                <ui:Label name="confirm-title" text="Delete project?" class="confirm-title"/>
+                <ui:Label name="confirm-message" text="Are you sure you want to delete this project?" class="confirm-message"/>
+                <ui:VisualElement class="confirm-actions">
+                    <ui:Button name="cancel-delete-btn" text="Cancel" class="confirm-cancel"/>
+                    <ui:Button name="confirm-delete-btn" text="Delete" class="confirm-delete"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="create-project-dialog" class="confirm-overlay hidden">
+            <ui:VisualElement class="confirm-card">
+                <ui:Label text="Create project" class="confirm-title"/>
+                <ui:Label text="Name your room before opening the AR designer." class="confirm-message"/>
+                <ui:TextField name="project-name-field" placeholder-text="Project name" class="dialog-input"/>
+                <ui:Label name="project-name-error" text="" class="dialog-error"/>
+                <ui:VisualElement class="confirm-actions">
+                    <ui:Button name="cancel-create-project-btn" text="Cancel" class="confirm-cancel"/>
+                    <ui:Button name="confirm-create-project-btn" text="Create" class="confirm-delete"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
