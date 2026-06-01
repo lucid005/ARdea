@@ -263,6 +263,10 @@
 
 .otp-button { top: 688px; }
 
+.verification-code { top: 488px; }
+
+.otp-error { top: 640px; }
+
 .resend-text {
     position: absolute;
     top: 848px;
@@ -324,6 +328,21 @@
     color: #d94a4a;
     font-size: 24px;
 }
+
+.login-error { width: 580px; }
+
+.resend-verification-text {
+    position: absolute;
+    top: 826px;
+    right: 80px;
+    color: #111111;
+    font-size: 24px;
+    -unity-font-style: bold;
+}
+
+.register-error { top: 1152px; }
+.forgot-error { top: 640px; }
+.new-password-error { top: 850px; }
 
 .hidden {
     display: none;

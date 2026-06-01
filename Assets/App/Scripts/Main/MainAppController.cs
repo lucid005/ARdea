@@ -98,24 +98,24 @@ public sealed class MainAppController : MonoBehaviour
         _projectNameField = root.Q<TextField>("project-name-field");
         _projectNameError = root.Q<Label>("project-name-error");
 
-        root.Q<Button>("add-project-btn").clicked += ShowCreateProjectDialog;
-        root.Q<Button>("settings-btn").clicked += ShowSettings;
-        root.Q<Button>("settings-back-btn").clicked += ShowProfile;
-        root.Q<Button>("saved-profile-back-btn").clicked += ShowProfile;
-        root.Q<Button>("projects-profile-back-btn").clicked += ShowProfile;
-        root.Q<Button>("signout-btn").clicked += SignOut;
-        root.Q<Button>("cancel-delete-btn").clicked += HideDeleteConfirmation;
-        root.Q<Button>("confirm-delete-btn").clicked += ConfirmDeleteProject;
-        root.Q<Button>("cancel-create-project-btn").clicked += HideCreateProjectDialog;
-        root.Q<Button>("confirm-create-project-btn").clicked += CreateNamedProject;
+        BindButton(root, "add-project-btn", ShowCreateProjectDialog);
+        BindButton(root, "settings-btn", ShowSettings);
+        BindButton(root, "settings-back-btn", ShowProfile);
+        BindButton(root, "saved-profile-back-btn", ShowProfile);
+        BindButton(root, "projects-profile-back-btn", ShowProfile);
+        BindButton(root, "signout-btn", SignOut);
+        BindButton(root, "cancel-delete-btn", HideDeleteConfirmation);
+        BindButton(root, "confirm-delete-btn", ConfirmDeleteProject);
+        BindButton(root, "cancel-create-project-btn", HideCreateProjectDialog);
+        BindButton(root, "confirm-create-project-btn", CreateNamedProject);
         RegisterClick(root.Q<VisualElement>("profile-saved-btn"), ShowSavedProfilePage);
         RegisterClick(root.Q<VisualElement>("profile-projects-btn"), ShowProjectsProfilePage);
         RegisterClick(root.Q<VisualElement>("profile-settings-btn"), ShowSettings);
         RegisterClick(root.Q<VisualElement>("profile-help-btn"), ShowHelp);
 
-        _navHome.clicked += ShowHome;
-        _navBrowse.clicked += ShowBrowse;
-        _navProfile.clicked += ShowProfile;
+        if (_navHome != null) _navHome.clicked += ShowHome;
+        if (_navBrowse != null) _navBrowse.clicked += ShowBrowse;
+        if (_navProfile != null) _navProfile.clicked += ShowProfile;
 
         if (_searchField != null)
             _searchField.RegisterValueChangedCallback(_ => RenderFurniture());
@@ -496,6 +496,18 @@ public sealed class MainAppController : MonoBehaviour
             return;
 
         element.RegisterCallback<ClickEvent>(_ => action());
+    }
+
+    private static void BindButton(VisualElement root, string name, Action action)
+    {
+        var button = root?.Q<Button>(name);
+        if (button == null)
+        {
+            Debug.LogWarning("[MainApp] Missing button: " + name);
+            return;
+        }
+
+        button.clicked += action;
     }
 
     private static void ConfigureMobileScrollView(ScrollView scrollView, bool horizontal, bool vertical)

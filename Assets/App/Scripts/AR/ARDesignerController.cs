@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.XR.Management;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 #if UNITY_ANDROID
@@ -43,6 +45,27 @@ public sealed class ARDesignerController : MonoBehaviour
 
     private void Awake()
     {
+        StartCoroutine(InitializeArRuntime());
+    }
+
+    private IEnumerator InitializeArRuntime()
+    {
+        var manager = XRGeneralSettings.Instance == null ? null : XRGeneralSettings.Instance.Manager;
+        if (manager != null)
+        {
+            if (manager.activeLoader == null)
+                yield return new WaitForEndOfFrame();
+
+            if (manager.activeLoader == null)
+                manager.InitializeLoaderSync();
+
+            if (manager.activeLoader != null && !manager.isInitializationComplete)
+                yield return new WaitForEndOfFrame();
+
+            if (manager.activeLoader != null)
+                manager.StartSubsystems();
+        }
+
         EnsureArRuntime();
     }
 
@@ -72,15 +95,15 @@ public sealed class ARDesignerController : MonoBehaviour
         _rotateToolButton = root.Q<Button>("rotate-tool-btn");
         _scaleToolButton = root.Q<Button>("scale-tool-btn");
 
-        root.Q<Button>("ar-back-btn").clicked += BackToMainApp;
-        root.Q<Button>("inventory-btn").clicked += ToggleInventory;
-        root.Q<Button>("placed-list-btn").clicked += TogglePlacedPanel;
-        root.Q<Button>("delete-btn").clicked += DeleteSelectedOrLast;
-        root.Q<Button>("save-project-btn").clicked += SaveProject;
+        BindButton(root, "ar-back-btn", BackToMainApp);
+        BindButton(root, "inventory-btn", ToggleInventory);
+        BindButton(root, "placed-list-btn", TogglePlacedPanel);
+        BindButton(root, "delete-btn", DeleteSelectedOrLast);
+        BindButton(root, "save-project-btn", SaveProject);
 
-        _moveToolButton.clicked += () => SetTransformMode(TransformMode.Move);
-        _rotateToolButton.clicked += () => SetTransformMode(TransformMode.Rotate);
-        _scaleToolButton.clicked += () => SetTransformMode(TransformMode.Scale);
+        if (_moveToolButton != null) _moveToolButton.clicked += () => SetTransformMode(TransformMode.Move);
+        if (_rotateToolButton != null) _rotateToolButton.clicked += () => SetTransformMode(TransformMode.Rotate);
+        if (_scaleToolButton != null) _scaleToolButton.clicked += () => SetTransformMode(TransformMode.Scale);
         root.RegisterCallback<ClickEvent>(ClosePanelsWhenClickingOutside);
 
         var browseMore = root.Q<Button>("browse-more-btn");
@@ -804,6 +827,18 @@ public sealed class ARDesignerController : MonoBehaviour
         scrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
         scrollView.mode = ScrollViewMode.Vertical;
         scrollView.touchScrollBehavior = ScrollView.TouchScrollBehavior.Elastic;
+    }
+
+    private static void BindButton(VisualElement root, string name, System.Action action)
+    {
+        var button = root?.Q<Button>(name);
+        if (button == null)
+        {
+            Debug.LogWarning("[ARDesigner] Missing button: " + name);
+            return;
+        }
+
+        button.clicked += action;
     }
 
     private void SaveProject()

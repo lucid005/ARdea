@@ -8,6 +8,7 @@ public static class AppState
     public static string ActiveProjectId { get; set; }
 
     public static bool IsSignedIn => CurrentUser != null && !string.IsNullOrEmpty(CurrentUser.LocalId);
+    public static bool HasRemoteAuth => CurrentUser != null && !string.IsNullOrEmpty(CurrentUser.IdToken);
 
     public static void SetUser(AuthUser user)
     {
@@ -36,6 +37,38 @@ public sealed class AuthUser
     public string DisplayName;
     public string IdToken;
     public string RefreshToken;
+    public long IdTokenExpiresAtUtcTicks;
+
+    public bool HasRefreshToken => !string.IsNullOrEmpty(RefreshToken);
+
+    public bool IsIdTokenExpiredOrNearExpiry()
+    {
+        if (string.IsNullOrEmpty(IdToken))
+            return true;
+
+        if (IdTokenExpiresAtUtcTicks <= 0)
+            return false;
+
+        return DateTime.UtcNow.AddMinutes(5).Ticks >= IdTokenExpiresAtUtcTicks;
+    }
+
+    public void SetTokenExpiryFromSeconds(string expiresIn)
+    {
+        if (!int.TryParse(expiresIn, out var seconds) || seconds <= 0)
+            seconds = 3600;
+
+        IdTokenExpiresAtUtcTicks = DateTime.UtcNow.AddSeconds(seconds).Ticks;
+    }
+
+    public AuthUser WithoutTokens()
+    {
+        return new AuthUser
+        {
+            LocalId = LocalId,
+            Email = Email,
+            DisplayName = DisplayName
+        };
+    }
 }
 
 [Serializable]

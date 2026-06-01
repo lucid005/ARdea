@@ -15,7 +15,8 @@
             <ui:TextField name="password-field" password="true" placeholder-text="Password" class="auth-input"/>
         </ui:VisualElement>
         <ui:Label name="forgot-btn" text="Forgot password?" class="forgot-link"/>
-        <ui:Label name="error-label" text="" class="error-label hidden"/>
+        <ui:Label name="error-label" text="" class="error-label login-error hidden"/>
+        <ui:Label name="resend-verification-btn" text="Resend verification email" class="resend-verification-text hidden"/>
         <ui:Button name="signin-btn" text="Sign in" class="button-primary login-primary"/>
         <ui:Button name="register-btn" text="Create account" class="button-outline login-register"/>
         <ui:Button name="guest-btn" text="Continue as guest" class="hidden"/>

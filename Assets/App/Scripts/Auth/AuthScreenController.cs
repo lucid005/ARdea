@@ -29,12 +29,20 @@ public class AuthScreenController : MonoBehaviour
     private TextField _passwordField;
     private TextField _usernameField;
     private TextField _confirmPasswordField;
+    private TextField _verificationCodeField;
     private Button _signInBtn;
     private Button _guestBtn;
     private Label _guestLabel;
     private Label _errorLabel;
+    private Label _resendVerificationLabel;
+    private Label _successTitleLabel;
+    private Label _successSubtitleLabel;
     private FirebaseRestService _firebase;
+    private readonly List<Button> _busyButtons = new List<Button>();
+    private AuthUser _pendingVerificationUser;
     private bool _isBusy;
+    private string _successTitle = "Check your email";
+    private string _successSubtitle = "We sent a secure Firebase email to your address.";
 
     private void OnEnable()
     {
@@ -76,6 +84,7 @@ public class AuthScreenController : MonoBehaviour
     private void BindCurrentScreen()
     {
         UnbindButtons();
+        _busyButtons.Clear();
 
         var root = uiDocument.rootVisualElement;
 
@@ -84,10 +93,14 @@ public class AuthScreenController : MonoBehaviour
         _passwordField = root.Q<TextField>("password-field");
         _usernameField = root.Q<TextField>("username-field");
         _confirmPasswordField = root.Q<TextField>("confirm-password-field");
+        _verificationCodeField = root.Q<TextField>("verification-code-field");
         _signInBtn = root.Q<Button>("signin-btn");
         _guestBtn = root.Q<Button>("guest-btn");
         _guestLabel = root.Q<Label>("guest-btn");
         _errorLabel = root.Q<Label>("error-label");
+        _resendVerificationLabel = root.Q<Label>("resend-verification-btn");
+        _successTitleLabel = root.Q<Label>("success-title");
+        _successSubtitleLabel = root.Q<Label>("success-subtitle");
 
         var backBtn = root.Q<Button>("back-btn");
         var welcomeLoginBtn = root.Q<Button>("login-btn");
@@ -101,6 +114,13 @@ public class AuthScreenController : MonoBehaviour
         var backLoginBtn = root.Q<Button>("back-login-btn");
         var resendBtn = root.Q<Label>("resend-btn");
 
+        TrackBusyButton(_signInBtn);
+        TrackBusyButton(_guestBtn);
+        TrackBusyButton(registerBtn);
+        TrackBusyButton(sendCodeBtn);
+        TrackBusyButton(verifyBtn);
+        TrackBusyButton(resetPasswordBtn);
+
         if (backBtn != null) backBtn.clicked += NavigateBack;
         if (welcomeLoginBtn != null) welcomeLoginBtn.clicked += () => NavigateTo(loginScreen);
         if (registerBtn != null) registerBtn.clicked += OnRegisterButtonClicked;
@@ -111,14 +131,16 @@ public class AuthScreenController : MonoBehaviour
         if (signUpBtn != null) signUpBtn.RegisterCallback<ClickEvent>(OnSignUpClicked);
         if (forgotBtn != null) forgotBtn.RegisterCallback<ClickEvent>(OnForgotClicked);
         if (sendCodeBtn != null) sendCodeBtn.clicked += OnSendPasswordResetClicked;
-        if (verifyBtn != null) verifyBtn.clicked += () => NavigateTo(createNewPasswordScreen);
+        if (verifyBtn != null) verifyBtn.clicked += OnVerifyEmailCodeClicked;
         if (resetPasswordBtn != null) resetPasswordBtn.clicked += () => NavigateTo(passwordChangedScreen);
         if (backLoginBtn != null) backLoginBtn.clicked += () => NavigateTo(loginScreen);
         if (resendBtn != null) resendBtn.RegisterCallback<ClickEvent>(OnResendClicked);
+        if (_resendVerificationLabel != null) _resendVerificationLabel.RegisterCallback<ClickEvent>(OnResendVerificationClicked);
 
         if (_passwordField != null)
             _passwordField.RegisterCallback<KeyDownEvent>(OnPasswordKeyDown);
 
+        ApplySuccessMessage();
         PlayCardAnimationIfPresent();
     }
 
@@ -133,17 +155,21 @@ public class AuthScreenController : MonoBehaviour
         var signUpBtn = root.Q<Label>("signup-btn");
         var forgotBtn = root.Q<Label>("forgot-btn");
         var resendBtn = root.Q<Label>("resend-btn");
+        var resendVerificationBtn = root.Q<Label>("resend-verification-btn");
         var loginLabel = root.Q<Label>("login-btn");
         var registerBtn = root.Q<Button>("register-btn");
+        var verifyBtn = root.Q<Button>("verify-btn");
 
         if (backBtn != null) backBtn.clicked -= NavigateBack;
         if (registerBtn != null) registerBtn.clicked -= OnRegisterButtonClicked;
+        if (verifyBtn != null) verifyBtn.clicked -= OnVerifyEmailCodeClicked;
         if (_signInBtn != null) _signInBtn.clicked -= OnSignInClicked;
         if (_guestBtn != null) _guestBtn.clicked -= OnGuestClicked;
         if (_guestLabel != null) _guestLabel.UnregisterCallback<ClickEvent>(OnGuestLabelClicked);
         if (signUpBtn != null) signUpBtn.UnregisterCallback<ClickEvent>(OnSignUpClicked);
         if (forgotBtn != null) forgotBtn.UnregisterCallback<ClickEvent>(OnForgotClicked);
         if (resendBtn != null) resendBtn.UnregisterCallback<ClickEvent>(OnResendClicked);
+        if (resendVerificationBtn != null) resendVerificationBtn.UnregisterCallback<ClickEvent>(OnResendVerificationClicked);
         if (loginLabel != null) loginLabel.UnregisterCallback<ClickEvent>(OnLoginLabelClicked);
         if (_passwordField != null) _passwordField.UnregisterCallback<KeyDownEvent>(OnPasswordKeyDown);
     }
@@ -271,7 +297,53 @@ public class AuthScreenController : MonoBehaviour
 
     private void OnResendClicked(ClickEvent evt)
     {
-        Debug.Log("[AuthScreen] Resend verification code.");
+        if (_currentScreen == otpVerificationScreen && _pendingVerificationUser != null)
+        {
+            if (_isBusy)
+                return;
+
+            StartCoroutine(SendVerificationEmailRoutine(_pendingVerificationUser, false));
+            return;
+        }
+
+        OnSendPasswordResetClicked();
+    }
+
+    private void OnResendVerificationClicked(ClickEvent evt)
+    {
+        if (_isBusy)
+            return;
+
+        if (_pendingVerificationUser == null || string.IsNullOrEmpty(_pendingVerificationUser.IdToken))
+        {
+            ShowError("Enter your email and password, then press Login to send a verification email.");
+            return;
+        }
+
+        StartCoroutine(SendVerificationEmailRoutine(_pendingVerificationUser, false));
+    }
+
+    private void OnVerifyEmailCodeClicked()
+    {
+        if (_isBusy)
+            return;
+
+        HideError();
+
+        var codeOrLink = _verificationCodeField?.value?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(codeOrLink))
+        {
+            ShowError("Paste the verification link or the code after oobCode=.");
+            return;
+        }
+
+        if (_pendingVerificationUser == null)
+        {
+            ShowError("Please sign in or create an account again, then paste the verification code.");
+            return;
+        }
+
+        StartCoroutine(ConfirmEmailVerificationRoutine(codeOrLink));
     }
 
     private IEnumerator SignInRoutine()
@@ -293,6 +365,23 @@ public class AuthScreenController : MonoBehaviour
             yield break;
         }
 
+        var isVerified = false;
+        yield return _firebase.IsEmailVerified(user, result => isVerified = result, message => error = message);
+        if (!string.IsNullOrEmpty(error))
+        {
+            SetBusy(false);
+            ShowError(error);
+            yield break;
+        }
+
+        if (!isVerified)
+        {
+            _pendingVerificationUser = user;
+            yield return SendVerificationEmailRoutine(user, true);
+            yield break;
+        }
+
+        _pendingVerificationUser = null;
         AppState.SetUser(user);
         yield return RestoreOrSeedRemoteData(user);
         SetBusy(false);
@@ -359,9 +448,94 @@ public class AuthScreenController : MonoBehaviour
             yield break;
         }
 
-        AppState.SetUser(user);
         yield return _firebase.SaveUserProfile(user);
         yield return _firebase.SyncAppData(user, LocalAppStore.LoadData());
+        string verificationEmail = null;
+        yield return _firebase.SendEmailVerification(user, emailAddress => verificationEmail = emailAddress, message => error = message);
+        SetBusy(false);
+
+        if (!string.IsNullOrEmpty(error))
+        {
+            ShowError(error);
+            yield break;
+        }
+
+        _pendingVerificationUser = user;
+        NavigateTo(otpVerificationScreen);
+        Debug.Log("[AuthScreen] Verification email accepted for " + (string.IsNullOrEmpty(verificationEmail) ? email : verificationEmail) + ".");
+    }
+
+    private IEnumerator SendVerificationEmailRoutine(AuthUser user, bool navigateToOtp)
+    {
+        SetBusy(true);
+        string error = null;
+        string targetEmail = null;
+        yield return _firebase.SendEmailVerification(user, emailAddress => targetEmail = emailAddress, message => error = message);
+        SetBusy(false);
+
+        if (!string.IsNullOrEmpty(error))
+        {
+            ShowError(error);
+            SetResendVerificationVisible(false);
+            yield break;
+        }
+
+        if (navigateToOtp)
+        {
+            NavigateTo(otpVerificationScreen);
+            yield break;
+        }
+
+        SetResendVerificationVisible(_currentScreen == loginScreen);
+        ShowError("Firebase accepted a verification email for " + targetEmail + ". Check Inbox, Spam, and Promotions.");
+    }
+
+    private IEnumerator ConfirmEmailVerificationRoutine(string codeOrLink)
+    {
+        SetBusy(true);
+        AuthUser verifiedUser = null;
+        string error = null;
+        yield return _firebase.ConfirmEmailVerification(
+            codeOrLink,
+            _pendingVerificationUser,
+            result => verifiedUser = result,
+            message => error = message);
+
+        if (!string.IsNullOrEmpty(error))
+        {
+            var alreadyVerified = false;
+            var lookupError = string.Empty;
+            yield return _firebase.IsEmailVerified(_pendingVerificationUser, result => alreadyVerified = result, message => lookupError = message);
+            if (!alreadyVerified)
+            {
+                SetBusy(false);
+                ShowError(error);
+                yield break;
+            }
+
+            verifiedUser = _pendingVerificationUser;
+            error = null;
+        }
+
+        var isVerified = false;
+        yield return _firebase.IsEmailVerified(verifiedUser, result => isVerified = result, message => error = message);
+        if (!string.IsNullOrEmpty(error))
+        {
+            SetBusy(false);
+            ShowError(error);
+            yield break;
+        }
+
+        if (!isVerified)
+        {
+            SetBusy(false);
+            ShowError("Firebase has not marked this email as verified yet. Try the latest verification link.");
+            yield break;
+        }
+
+        _pendingVerificationUser = null;
+        AppState.SetUser(verifiedUser);
+        yield return RestoreOrSeedRemoteData(verifiedUser);
         SetBusy(false);
         OnAuthSuccess();
     }
@@ -413,7 +587,9 @@ public class AuthScreenController : MonoBehaviour
             yield break;
         }
 
-        NavigateTo(otpVerificationScreen);
+        ShowSuccessScreen(
+            "Check your email",
+            "We sent a secure Firebase password reset link to " + email + ".");
     }
 
     private void OnAuthSuccess()
@@ -436,8 +612,12 @@ public class AuthScreenController : MonoBehaviour
     private void SetBusy(bool busy)
     {
         _isBusy = busy;
-        if (_signInBtn != null) _signInBtn.SetEnabled(!busy);
-        if (_guestBtn != null) _guestBtn.SetEnabled(!busy);
+        foreach (var button in _busyButtons)
+        {
+            if (button != null)
+                button.SetEnabled(!busy);
+        }
+
         if (_guestLabel != null) _guestLabel.SetEnabled(!busy);
 
         if (_signInBtn == null)
@@ -451,6 +631,28 @@ public class AuthScreenController : MonoBehaviour
             _signInBtn.RemoveFromClassList("btn-primary--loading");
     }
 
+    private void TrackBusyButton(Button button)
+    {
+        if (button != null && !_busyButtons.Contains(button))
+            _busyButtons.Add(button);
+    }
+
+    private void ShowSuccessScreen(string title, string subtitle)
+    {
+        _successTitle = title;
+        _successSubtitle = subtitle;
+        NavigateTo(passwordChangedScreen);
+    }
+
+    private void ApplySuccessMessage()
+    {
+        if (_successTitleLabel != null)
+            _successTitleLabel.text = _successTitle;
+
+        if (_successSubtitleLabel != null)
+            _successSubtitleLabel.text = _successSubtitle;
+    }
+
     private void ShowError(string message)
     {
         if (_errorLabel == null)
@@ -460,6 +662,12 @@ public class AuthScreenController : MonoBehaviour
         _errorLabel.RemoveFromClassList("hidden");
     }
 
+    private void SetResendVerificationVisible(bool visible)
+    {
+        if (_resendVerificationLabel != null)
+            _resendVerificationLabel.EnableInClassList("hidden", !visible);
+    }
+
     private void HideError()
     {
         if (_errorLabel == null)
@@ -467,5 +675,6 @@ public class AuthScreenController : MonoBehaviour
 
         _errorLabel.AddToClassList("hidden");
         _errorLabel.text = string.Empty;
+        SetResendVerificationVisible(false);
     }
 }

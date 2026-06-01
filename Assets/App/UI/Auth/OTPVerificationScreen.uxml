@@ -5,17 +5,14 @@
         <ui:Label text="LTE  86%" class="status-icons"/>
         <ui:VisualElement class="gesture-handle"/>
         <ui:Button name="back-btn" text="&#8249;" class="back-button"/>
-        <ui:Label text="OTP Verification" class="screen-title offset-title"/>
-        <ui:Label text="Enter the verification code we just sent to your email address." class="screen-subtitle offset-subtitle"/>
-        <ui:VisualElement class="otp-row">
-            <ui:TextField name="otp-1" max-length="1" class="otp-box"/>
-            <ui:TextField name="otp-2" max-length="1" class="otp-box"/>
-            <ui:TextField name="otp-3" max-length="1" class="otp-box"/>
-            <ui:TextField name="otp-4" max-length="1" class="otp-box"/>
-            <ui:TextField name="otp-5" max-length="1" class="otp-box"/>
-            <ui:TextField name="otp-6" max-length="1" class="otp-box"/>
+        <ui:Label text="Verify email" class="screen-title offset-title"/>
+        <ui:Label text="Paste the Firebase verification link or the code after oobCode= from your email." class="screen-subtitle offset-subtitle"/>
+        <ui:VisualElement class="field-block verification-code">
+            <ui:Label text="Verification code or link" class="field-label"/>
+            <ui:TextField name="verification-code-field" class="auth-input"/>
         </ui:VisualElement>
-        <ui:Button name="verify-btn" text="Verify" class="button-primary otp-button"/>
-        <ui:Label name="resend-btn" text="Didn't receive code? Resend" class="resend-text"/>
+        <ui:Label name="error-label" text="" class="error-label otp-error hidden"/>
+        <ui:Button name="verify-btn" text="Verify email" class="button-primary otp-button"/>
+        <ui:Label name="resend-btn" text="Didn't receive email? Resend" class="resend-text"/>
     </ui:VisualElement>
 </ui:UXML>

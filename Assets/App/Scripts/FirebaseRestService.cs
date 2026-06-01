@@ -35,7 +35,125 @@ public sealed class FirebaseRestService : MonoBehaviour
         }
 
         createdUser.DisplayName = displayName;
+        yield return UpdateAccountProfile(createdUser, displayName);
         onSuccess?.Invoke(createdUser);
+    }
+
+    public IEnumerator SendEmailVerification(AuthUser user, Action<string> onSuccess, Action<string> onError)
+    {
+        if (user == null || string.IsNullOrEmpty(user.IdToken))
+        {
+            onError?.Invoke("Please log in again before verifying your email.");
+            yield break;
+        }
+
+        string tokenError = null;
+        yield return EnsureFreshToken(user, message => tokenError = message);
+        if (!string.IsNullOrEmpty(tokenError))
+        {
+            onError?.Invoke(tokenError);
+            yield break;
+        }
+
+        var body = JsonUtility.ToJson(new VerifyEmailRequest("VERIFY_EMAIL", user.IdToken));
+        var url = $"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={_config.ApiKey}";
+        using (var request = CreateJsonRequest(url, body))
+        {
+            yield return request.SendWebRequest();
+            var responseText = request.downloadHandler.text;
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                var response = JsonUtility.FromJson<EmailActionResponse>(responseText);
+                var targetEmail = string.IsNullOrEmpty(response?.email) ? user.Email : response.email;
+                Debug.Log("[FirebaseRestService] Firebase accepted verification email for " + targetEmail + ".");
+                onSuccess?.Invoke(targetEmail);
+            }
+            else
+            {
+                Debug.LogWarning("[FirebaseRestService] Verification email request failed (" + request.responseCode + "): " + responseText);
+                onError?.Invoke(ParseFirebaseError(responseText));
+            }
+        }
+    }
+
+    public IEnumerator ConfirmEmailVerification(string codeOrLink, AuthUser currentUser, Action<AuthUser> onSuccess, Action<string> onError)
+    {
+        if (!_config.IsValid)
+        {
+            onError?.Invoke("Firebase config is missing.");
+            yield break;
+        }
+
+        var oobCode = ExtractOobCode(codeOrLink);
+        if (string.IsNullOrEmpty(oobCode))
+        {
+            onError?.Invoke("Paste the verification link or the code after oobCode=.");
+            yield break;
+        }
+
+        var body = JsonUtility.ToJson(new EmailVerificationConfirmRequest(oobCode, true));
+        var url = $"https://identitytoolkit.googleapis.com/v1/accounts:update?key={_config.ApiKey}";
+        using (var request = CreateJsonRequest(url, body))
+        {
+            yield return request.SendWebRequest();
+            var responseText = request.downloadHandler.text;
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning("[FirebaseRestService] Email verification confirm failed (" + request.responseCode + "): " + responseText);
+                onError?.Invoke(ParseFirebaseError(responseText));
+                yield break;
+            }
+
+            var response = JsonUtility.FromJson<AuthResponse>(responseText);
+            var verifiedUser = currentUser ?? new AuthUser();
+            if (!string.IsNullOrEmpty(response.localId))
+                verifiedUser.LocalId = response.localId;
+            if (!string.IsNullOrEmpty(response.email))
+                verifiedUser.Email = response.email;
+            if (!string.IsNullOrEmpty(response.displayName))
+                verifiedUser.DisplayName = response.displayName;
+            if (!string.IsNullOrEmpty(response.idToken))
+                verifiedUser.IdToken = response.idToken;
+            if (!string.IsNullOrEmpty(response.refreshToken))
+                verifiedUser.RefreshToken = response.refreshToken;
+            verifiedUser.SetTokenExpiryFromSeconds(response.expiresIn);
+
+            Debug.Log("[FirebaseRestService] Firebase confirmed email verification for " + verifiedUser.Email + ".");
+            onSuccess?.Invoke(verifiedUser);
+        }
+    }
+
+    public IEnumerator IsEmailVerified(AuthUser user, Action<bool> onSuccess, Action<string> onError)
+    {
+        if (user == null || string.IsNullOrEmpty(user.IdToken))
+        {
+            onError?.Invoke("Please log in again to check email verification.");
+            yield break;
+        }
+
+        string tokenError = null;
+        yield return EnsureFreshToken(user, message => tokenError = message);
+        if (!string.IsNullOrEmpty(tokenError))
+        {
+            onError?.Invoke(tokenError);
+            yield break;
+        }
+
+        var body = JsonUtility.ToJson(new IdTokenRequest(user.IdToken));
+        var url = $"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={_config.ApiKey}";
+        using (var request = CreateJsonRequest(url, body))
+        {
+            yield return request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                onError?.Invoke(ParseFirebaseError(request.downloadHandler.text));
+                yield break;
+            }
+
+            var response = JsonUtility.FromJson<LookupResponse>(request.downloadHandler.text);
+            var verified = response?.users != null && response.users.Length > 0 && response.users[0].emailVerified;
+            onSuccess?.Invoke(verified);
+        }
     }
 
     public IEnumerator SendPasswordReset(string email, Action onSuccess, Action<string> onError)
@@ -45,10 +163,18 @@ public sealed class FirebaseRestService : MonoBehaviour
         using (var request = CreateJsonRequest(url, body))
         {
             yield return request.SendWebRequest();
+            var responseText = request.downloadHandler.text;
             if (request.result == UnityWebRequest.Result.Success)
+            {
+                var response = JsonUtility.FromJson<EmailActionResponse>(responseText);
+                Debug.Log("[FirebaseRestService] Firebase accepted password reset email for " + (string.IsNullOrEmpty(response?.email) ? email : response.email) + ".");
                 onSuccess?.Invoke();
+            }
             else
-                onError?.Invoke(ParseFirebaseError(request.downloadHandler.text));
+            {
+                Debug.LogWarning("[FirebaseRestService] Password reset request failed (" + request.responseCode + "): " + responseText);
+                onError?.Invoke(ParseFirebaseError(responseText));
+            }
         }
     }
 
@@ -56,6 +182,14 @@ public sealed class FirebaseRestService : MonoBehaviour
     {
         if (user == null || string.IsNullOrEmpty(user.IdToken))
             yield break;
+
+        string tokenError = null;
+        yield return EnsureFreshToken(user, message => tokenError = message);
+        if (!string.IsNullOrEmpty(tokenError))
+        {
+            Debug.LogWarning("[FirebaseRestService] Could not refresh auth token: " + tokenError);
+            yield break;
+        }
 
         var body = "{\"fields\":{\"email\":{\"stringValue\":\"" + Escape(user.Email) + "\"},\"displayName\":{\"stringValue\":\"" + Escape(user.DisplayName) + "\"}}}";
         var url = $"https://firestore.googleapis.com/v1/projects/{_config.ProjectId}/databases/(default)/documents/users/{user.LocalId}?key={_config.ApiKey}";
@@ -70,6 +204,14 @@ public sealed class FirebaseRestService : MonoBehaviour
     {
         if (user == null || string.IsNullOrEmpty(user.IdToken) || data == null)
             yield break;
+
+        string tokenError = null;
+        yield return EnsureFreshToken(user, message => tokenError = message);
+        if (!string.IsNullOrEmpty(tokenError))
+        {
+            Debug.LogWarning("[FirebaseRestService] Could not refresh auth token: " + tokenError);
+            yield break;
+        }
 
         var escapedJson = Escape(JsonUtility.ToJson(data));
         var body = "{\"fields\":{\"json\":{\"stringValue\":\"" + escapedJson + "\"}}}";
@@ -92,6 +234,14 @@ public sealed class FirebaseRestService : MonoBehaviour
         if (!_config.IsValid)
         {
             onError?.Invoke("Firebase config is missing.");
+            yield break;
+        }
+
+        string tokenError = null;
+        yield return EnsureFreshToken(user, message => tokenError = message);
+        if (!string.IsNullOrEmpty(tokenError))
+        {
+            onError?.Invoke(tokenError);
             yield break;
         }
 
@@ -153,14 +303,79 @@ public sealed class FirebaseRestService : MonoBehaviour
             }
 
             var response = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
-            onSuccess?.Invoke(new AuthUser
+            var user = new AuthUser
             {
                 LocalId = response.localId,
                 Email = response.email,
                 DisplayName = response.displayName,
                 IdToken = response.idToken,
                 RefreshToken = response.refreshToken
-            });
+            };
+            user.SetTokenExpiryFromSeconds(response.expiresIn);
+            onSuccess?.Invoke(user);
+        }
+    }
+
+    private IEnumerator UpdateAccountProfile(AuthUser user, string displayName)
+    {
+        if (user == null || string.IsNullOrEmpty(user.IdToken) || string.IsNullOrEmpty(displayName))
+            yield break;
+
+        var body = JsonUtility.ToJson(new AccountProfileRequest(user.IdToken, displayName, true));
+        var url = $"https://identitytoolkit.googleapis.com/v1/accounts:update?key={_config.ApiKey}";
+        using (var request = CreateJsonRequest(url, body))
+        {
+            yield return request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success)
+                Debug.LogWarning("[FirebaseRestService] Could not update Firebase profile: " + ParseFirebaseError(request.downloadHandler.text));
+        }
+    }
+
+    private IEnumerator EnsureFreshToken(AuthUser user, Action<string> onError)
+    {
+        if (user == null || !user.IsIdTokenExpiredOrNearExpiry())
+            yield break;
+
+        if (string.IsNullOrEmpty(user.RefreshToken))
+        {
+            onError?.Invoke("Please log in again to sync your projects.");
+            yield break;
+        }
+
+        if (!_config.IsValid)
+        {
+            onError?.Invoke("Firebase config is missing.");
+            yield break;
+        }
+
+        var body = "grant_type=refresh_token&refresh_token=" + UnityWebRequest.EscapeURL(user.RefreshToken);
+        var url = $"https://securetoken.googleapis.com/v1/token?key={_config.ApiKey}";
+        using (var request = new UnityWebRequest(url, "POST"))
+        {
+            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(body));
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                onError?.Invoke(ParseFirebaseError(request.downloadHandler.text));
+                yield break;
+            }
+
+            var response = JsonUtility.FromJson<TokenRefreshResponse>(request.downloadHandler.text);
+            var idToken = string.IsNullOrEmpty(response.id_token) ? response.access_token : response.id_token;
+            if (string.IsNullOrEmpty(idToken))
+            {
+                onError?.Invoke("Could not refresh your session. Please log in again.");
+                yield break;
+            }
+
+            user.IdToken = idToken;
+            if (!string.IsNullOrEmpty(response.refresh_token))
+                user.RefreshToken = response.refresh_token;
+
+            user.SetTokenExpiryFromSeconds(response.expires_in);
         }
     }
 
@@ -204,8 +419,14 @@ public sealed class FirebaseRestService : MonoBehaviour
                 return "Too many attempts. Try again later.";
             case "OPERATION_NOT_ALLOWED":
                 return "Email/password login is not enabled in Firebase.";
+            case "INVALID_OOB_CODE":
+                return "Verification code is invalid. Paste the latest link or request a new email.";
+            case "EXPIRED_OOB_CODE":
+                return "Verification code expired. Request a new email and try again.";
             case "INVALID_ID_TOKEN":
             case "TOKEN_EXPIRED":
+            case "INVALID_REFRESH_TOKEN":
+            case "TOKEN_EXPIRED : Token has expired":
                 return "Your session expired. Please log in again.";
             case "PERMISSION_DENIED":
                 return "Firestore permission denied. Check your database rules.";
@@ -239,6 +460,26 @@ public sealed class FirebaseRestService : MonoBehaviour
     private static string Escape(string value)
     {
         return (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"");
+    }
+
+    private static string ExtractOobCode(string codeOrLink)
+    {
+        if (string.IsNullOrWhiteSpace(codeOrLink))
+            return string.Empty;
+
+        var value = codeOrLink.Trim().Replace("&amp;", "&");
+        var match = Regex.Match(value, "(?:[?&]|^)oobCode=([^&#\\s]+)", RegexOptions.IgnoreCase);
+        if (!match.Success)
+            return value;
+
+        try
+        {
+            return Uri.UnescapeDataString(match.Groups[1].Value);
+        }
+        catch
+        {
+            return match.Groups[1].Value;
+        }
     }
 
     private static string ExtractFirestoreStringField(string json, string fieldName)
@@ -322,6 +563,59 @@ public sealed class FirebaseRestService : MonoBehaviour
     }
 
     [Serializable]
+    private sealed class VerifyEmailRequest
+    {
+        public string requestType;
+        public string idToken;
+
+        public VerifyEmailRequest(string requestType, string idToken)
+        {
+            this.requestType = requestType;
+            this.idToken = idToken;
+        }
+    }
+
+    [Serializable]
+    private sealed class IdTokenRequest
+    {
+        public string idToken;
+
+        public IdTokenRequest(string idToken)
+        {
+            this.idToken = idToken;
+        }
+    }
+
+    [Serializable]
+    private sealed class EmailVerificationConfirmRequest
+    {
+        public string oobCode;
+        public bool returnSecureToken;
+
+        public EmailVerificationConfirmRequest(string oobCode, bool returnSecureToken)
+        {
+            this.oobCode = oobCode;
+            this.returnSecureToken = returnSecureToken;
+        }
+    }
+
+    [Serializable]
+    private sealed class AccountProfileRequest
+    {
+        public string idToken;
+        public string displayName;
+        public bool returnSecureToken;
+
+        public AccountProfileRequest(string idToken, string displayName, bool returnSecureToken)
+        {
+            this.idToken = idToken;
+            this.displayName = displayName;
+            this.returnSecureToken = returnSecureToken;
+        }
+    }
+
+#pragma warning disable 0649
+    [Serializable]
     private sealed class AuthResponse
     {
         public string localId;
@@ -329,7 +623,36 @@ public sealed class FirebaseRestService : MonoBehaviour
         public string displayName;
         public string idToken;
         public string refreshToken;
+        public string expiresIn;
     }
+
+    [Serializable]
+    private sealed class TokenRefreshResponse
+    {
+        public string access_token;
+        public string expires_in;
+        public string id_token;
+        public string refresh_token;
+    }
+
+    [Serializable]
+    private sealed class LookupResponse
+    {
+        public LookupUser[] users;
+    }
+
+    [Serializable]
+    private sealed class LookupUser
+    {
+        public bool emailVerified;
+    }
+
+    [Serializable]
+    private sealed class EmailActionResponse
+    {
+        public string email;
+    }
+#pragma warning restore 0649
 
     private sealed class FirebaseConfig
     {

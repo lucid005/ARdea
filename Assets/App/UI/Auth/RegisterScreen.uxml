@@ -22,6 +22,7 @@
             <ui:Label text="Confirm password" class="field-label"/>
             <ui:TextField name="confirm-password-field" password="true" placeholder-text="Confirm password" class="auth-input"/>
         </ui:VisualElement>
+        <ui:Label name="error-label" text="" class="error-label register-error hidden"/>
         <ui:Button name="register-btn" text="Register" class="button-primary register-primary"/>
         <ui:Label name="login-btn" text="Already have an account? Sign in" class="button-outline register-login"/>
     </ui:VisualElement>

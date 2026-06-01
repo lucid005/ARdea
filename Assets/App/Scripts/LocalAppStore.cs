@@ -13,14 +13,25 @@ public static class LocalAppStore
         if (user == null)
             return;
 
-        PlayerPrefs.SetString(SessionKey, JsonUtility.ToJson(user));
+        PlayerPrefs.SetString(SessionKey, JsonUtility.ToJson(user.WithoutTokens()));
         PlayerPrefs.Save();
     }
 
     public static AuthUser LoadSession()
     {
         var json = PlayerPrefs.GetString(SessionKey, string.Empty);
-        return string.IsNullOrEmpty(json) ? null : JsonUtility.FromJson<AuthUser>(json);
+        if (string.IsNullOrEmpty(json))
+            return null;
+
+        var user = JsonUtility.FromJson<AuthUser>(json);
+        if (user == null)
+            return null;
+
+        user.IdToken = null;
+        user.RefreshToken = null;
+        user.IdTokenExpiresAtUtcTicks = 0;
+        SaveSession(user);
+        return user;
     }
 
     public static void ClearSession()

@@ -1,5 +1,12 @@
 fileFormatVersion: 2
 guid: 413918a6bc731d744ba9334e295cb072
+AssetOrigin:
+  serializedVersion: 1
+  productId: 330002
+  packageName: Furniture Mega Pack - Free
+  packageVersion: 1.0
+  assetPath: Assets/Furniture Mega Pack/Scenes/Furniture Mega Pack/ReflectionProbe-1.exr
+  uploadId: 785398
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -128,10 +135,3 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 330002
-  packageName: Furniture Mega Pack - Free
-  packageVersion: 1.0
-  assetPath: Assets/Furniture Mega Pack/Scenes/Furniture Mega Pack/ReflectionProbe-1.exr
-  uploadId: 785398
