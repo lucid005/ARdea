@@ -89,42 +89,42 @@
             <ui:Label text="Settings" class="screen-title settings-title"/>
             <ui:Label text="Update preferences for your account and AR workspace." class="screen-subtitle settings-subtitle"/>
             <ui:VisualElement class="settings-list">
-                <ui:VisualElement class="settings-list-item">
+                <ui:VisualElement name="settings-account-btn" class="settings-list-item">
                     <ui:VisualElement class="settings-list-copy">
                         <ui:Label text="Account" class="settings-list-title"/>
                         <ui:Label text="Name, email and password" class="settings-list-subtitle"/>
                     </ui:VisualElement>
                     <ui:Label text="&gt;" class="settings-list-chevron"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="settings-list-item">
+                <ui:VisualElement name="settings-notifications-btn" class="settings-list-item">
                     <ui:VisualElement class="settings-list-copy">
                         <ui:Label text="Notifications" class="settings-list-title"/>
                         <ui:Label text="Project reminders and app updates" class="settings-list-subtitle"/>
                     </ui:VisualElement>
                     <ui:Label text="&gt;" class="settings-list-chevron"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="settings-list-item">
+                <ui:VisualElement name="settings-ar-btn" class="settings-list-item">
                     <ui:VisualElement class="settings-list-copy">
                         <ui:Label text="AR preferences" class="settings-list-title"/>
                         <ui:Label text="Plane guides and object controls" class="settings-list-subtitle"/>
                     </ui:VisualElement>
                     <ui:Label text="&gt;" class="settings-list-chevron"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="settings-list-item">
+                <ui:VisualElement name="settings-units-btn" class="settings-list-item">
                     <ui:VisualElement class="settings-list-copy">
                         <ui:Label text="Units" class="settings-list-title"/>
                         <ui:Label text="Centimeters" class="settings-list-subtitle"/>
                     </ui:VisualElement>
                     <ui:Label text="&gt;" class="settings-list-chevron"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="settings-list-item">
+                <ui:VisualElement name="settings-privacy-btn" class="settings-list-item">
                     <ui:VisualElement class="settings-list-copy">
                         <ui:Label text="Privacy" class="settings-list-title"/>
                         <ui:Label text="Data and saved projects" class="settings-list-subtitle"/>
                     </ui:VisualElement>
                     <ui:Label text="&gt;" class="settings-list-chevron"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="settings-list-item">
+                <ui:VisualElement name="settings-about-btn" class="settings-list-item">
                     <ui:VisualElement class="settings-list-copy">
                         <ui:Label text="About ARdea" class="settings-list-title"/>
                         <ui:Label text="Version 1.0" class="settings-list-subtitle"/>
@@ -147,6 +147,20 @@
             <ui:Label text="My projects" class="screen-title detail-title"/>
             <ui:Label text="All rooms created in your ARdea workspace." class="screen-subtitle detail-subtitle"/>
             <ui:ScrollView name="projects-profile-list" class="profile-detail-list"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="help-profile-page" class="page hidden profile-detail-page">
+            <ui:Button name="help-profile-back-btn" text="&lt;" class="back-button"/>
+            <ui:Label text="Help" class="screen-title detail-title"/>
+            <ui:Label text="Quick guide for creating rooms and placing furniture in AR." class="screen-subtitle detail-subtitle"/>
+            <ui:ScrollView name="help-profile-list" class="profile-detail-list"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-detail-page" class="page hidden profile-detail-page">
+            <ui:Button name="settings-detail-back-btn" text="&lt;" class="back-button"/>
+            <ui:Label name="settings-detail-title-label" text="Settings" class="screen-title detail-title"/>
+            <ui:Label name="settings-detail-subtitle-label" text="Manage this option." class="screen-subtitle detail-subtitle"/>
+            <ui:ScrollView name="settings-detail-list" class="profile-detail-list"/>
         </ui:VisualElement>
 
         <ui:Label text="9:41" class="status-time"/>

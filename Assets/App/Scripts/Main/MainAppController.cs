@@ -19,6 +19,8 @@ public sealed class MainAppController : MonoBehaviour
     private VisualElement _settingsPage;
     private VisualElement _savedProfilePage;
     private VisualElement _projectsProfilePage;
+    private VisualElement _helpProfilePage;
+    private VisualElement _settingsDetailPage;
     private Button _navHome;
     private Button _navBrowse;
     private Button _navProfile;
@@ -26,6 +28,8 @@ public sealed class MainAppController : MonoBehaviour
     private ScrollView _projectList;
     private ScrollView _savedProfileList;
     private ScrollView _projectsProfileList;
+    private ScrollView _helpProfileList;
+    private ScrollView _settingsDetailList;
     private ScrollView _categoryRow;
     private ScrollView _furnitureList;
     private TextField _searchField;
@@ -37,6 +41,8 @@ public sealed class MainAppController : MonoBehaviour
     private Label _profileEmailLabel;
     private Label _browseTitleLabel;
     private Label _browseSubtitleLabel;
+    private Label _settingsDetailTitleLabel;
+    private Label _settingsDetailSubtitleLabel;
     private VisualElement _confirmDialog;
     private Label _confirmMessage;
     private VisualElement _createProjectDialog;
@@ -69,6 +75,8 @@ public sealed class MainAppController : MonoBehaviour
         _settingsPage = root.Q<VisualElement>("settings-page");
         _savedProfilePage = root.Q<VisualElement>("saved-profile-page");
         _projectsProfilePage = root.Q<VisualElement>("projects-profile-page");
+        _helpProfilePage = root.Q<VisualElement>("help-profile-page");
+        _settingsDetailPage = root.Q<VisualElement>("settings-detail-page");
         _navHome = root.Q<Button>("nav-home");
         _navBrowse = root.Q<Button>("nav-browse");
         _navProfile = root.Q<Button>("nav-profile");
@@ -76,11 +84,15 @@ public sealed class MainAppController : MonoBehaviour
         _projectList = root.Q<ScrollView>("project-list");
         _savedProfileList = root.Q<ScrollView>("saved-profile-list");
         _projectsProfileList = root.Q<ScrollView>("projects-profile-list");
+        _helpProfileList = root.Q<ScrollView>("help-profile-list");
+        _settingsDetailList = root.Q<ScrollView>("settings-detail-list");
         _categoryRow = root.Q<ScrollView>("category-row");
         _furnitureList = root.Q<ScrollView>("furniture-list");
         ConfigureMobileScrollView(_projectList, false, true);
         ConfigureMobileScrollView(_savedProfileList, false, true);
         ConfigureMobileScrollView(_projectsProfileList, false, true);
+        ConfigureMobileScrollView(_helpProfileList, false, true);
+        ConfigureMobileScrollView(_settingsDetailList, false, true);
         ConfigureMobileScrollView(_categoryRow, true, false);
         ConfigureMobileScrollView(_furnitureList, false, true);
         _searchField = root.Q<TextField>("search-field");
@@ -92,6 +104,8 @@ public sealed class MainAppController : MonoBehaviour
         _profileEmailLabel = root.Q<Label>("profile-email-label");
         _browseTitleLabel = root.Q<Label>("browse-title-label");
         _browseSubtitleLabel = root.Q<Label>("browse-subtitle-label");
+        _settingsDetailTitleLabel = root.Q<Label>("settings-detail-title-label");
+        _settingsDetailSubtitleLabel = root.Q<Label>("settings-detail-subtitle-label");
         _confirmDialog = root.Q<VisualElement>("confirm-dialog");
         _confirmMessage = root.Q<Label>("confirm-message");
         _createProjectDialog = root.Q<VisualElement>("create-project-dialog");
@@ -103,6 +117,8 @@ public sealed class MainAppController : MonoBehaviour
         BindButton(root, "settings-back-btn", ShowProfile);
         BindButton(root, "saved-profile-back-btn", ShowProfile);
         BindButton(root, "projects-profile-back-btn", ShowProfile);
+        BindButton(root, "help-profile-back-btn", ShowProfile);
+        BindButton(root, "settings-detail-back-btn", ShowSettings);
         BindButton(root, "signout-btn", SignOut);
         BindButton(root, "cancel-delete-btn", HideDeleteConfirmation);
         BindButton(root, "confirm-delete-btn", ConfirmDeleteProject);
@@ -112,6 +128,12 @@ public sealed class MainAppController : MonoBehaviour
         RegisterClick(root.Q<VisualElement>("profile-projects-btn"), ShowProjectsProfilePage);
         RegisterClick(root.Q<VisualElement>("profile-settings-btn"), ShowSettings);
         RegisterClick(root.Q<VisualElement>("profile-help-btn"), ShowHelp);
+        RegisterClick(root.Q<VisualElement>("settings-account-btn"), ShowAccountSettings);
+        RegisterClick(root.Q<VisualElement>("settings-notifications-btn"), ShowNotificationSettings);
+        RegisterClick(root.Q<VisualElement>("settings-ar-btn"), ShowArSettings);
+        RegisterClick(root.Q<VisualElement>("settings-units-btn"), ShowUnitSettings);
+        RegisterClick(root.Q<VisualElement>("settings-privacy-btn"), ShowPrivacySettings);
+        RegisterClick(root.Q<VisualElement>("settings-about-btn"), ShowAboutSettings);
 
         if (_navHome != null) _navHome.clicked += ShowHome;
         if (_navBrowse != null) _navBrowse.clicked += ShowBrowse;
@@ -123,6 +145,7 @@ public sealed class MainAppController : MonoBehaviour
         RenderProjects();
         RenderProfileProjects();
         RenderProfileSavedFurniture();
+        RenderHelpGuide();
         RenderCategories();
         RenderFurniture();
         UpdateCounts();
@@ -189,7 +212,74 @@ public sealed class MainAppController : MonoBehaviour
 
     private void ShowHelp()
     {
-        ShowSettings();
+        _showSavedOnly = false;
+        RenderHelpGuide();
+        ShowPage(_helpProfilePage);
+        SetActiveNav(null);
+    }
+
+    private void ShowAccountSettings()
+    {
+        var user = AppState.CurrentUser;
+        var name = user == null || string.IsNullOrEmpty(user.DisplayName) ? "ARdea User" : user.DisplayName;
+        var email = user == null || string.IsNullOrEmpty(user.Email) ? "name@example.com" : user.Email;
+
+        ShowSettingsDetail(
+            "Account",
+            "Name, email and password for your ARdea account.",
+            ("Display name", name),
+            ("Email address", email),
+            ("Password", "Use Firebase password reset from the sign-in screen to change your password safely."));
+    }
+
+    private void ShowNotificationSettings()
+    {
+        ShowSettingsDetail(
+            "Notifications",
+            "Project reminders and app update preferences.",
+            ("Email verification", "Firebase verification emails are sent when your account needs confirmation."),
+            ("Project reminders", "Room planning reminders are ready for future notification support."),
+            ("App updates", "Important ARdea updates will appear here when available."));
+    }
+
+    private void ShowArSettings()
+    {
+        ShowSettingsDetail(
+            "AR preferences",
+            "Plane guides and object controls used inside the AR designer.",
+            ("Plane detection", "Point your camera at the floor and move slowly until placement surfaces appear."),
+            ("Transform tools", "Use Move, Rotate, and Scale inside the AR designer after selecting furniture."),
+            ("Project saving", "Placed furniture is stored with the active project when you save from AR mode."));
+    }
+
+    private void ShowUnitSettings()
+    {
+        ShowSettingsDetail(
+            "Units",
+            "Measurement settings used for AR room planning.",
+            ("Current unit", "Centimeters"),
+            ("Scale behavior", "Furniture scale values are stored per object in each project."),
+            ("Future options", "Meters and inches can be added here when measurement overlays are introduced."));
+    }
+
+    private void ShowPrivacySettings()
+    {
+        ShowSettingsDetail(
+            "Privacy",
+            "Data and saved project storage.",
+            ("Local data", "Saved furniture and projects are cached on this device."),
+            ("Cloud sync", "Signed-in accounts sync project data to Firebase Firestore."),
+            ("Sign out", "Use Log out on the Settings page to clear the active session on this device."));
+    }
+
+    private void ShowAboutSettings()
+    {
+        ShowSettingsDetail(
+            "About ARdea",
+            "Version and project information.",
+            ("Version", "1.0"),
+            ("Purpose", "ARdea helps plan interiors by saving furniture and placing it in AR rooms."),
+            ("Project", "AI-assisted AR interior design and room planning app."));
     }
 
     private void ShowPage(VisualElement page)
@@ -200,9 +290,17 @@ public sealed class MainAppController : MonoBehaviour
         SetPageVisible(_settingsPage, page == _settingsPage);
         SetPageVisible(_savedProfilePage, page == _savedProfilePage);
         SetPageVisible(_projectsProfilePage, page == _projectsProfilePage);
+        SetPageVisible(_helpProfilePage, page == _helpProfilePage);
+        SetPageVisible(_settingsDetailPage, page == _settingsDetailPage);
 
         if (_bottomNav != null)
-            _bottomNav.EnableInClassList("hidden", page == _settingsPage || page == _savedProfilePage || page == _projectsProfilePage);
+            _bottomNav.EnableInClassList(
+                "hidden",
+                page == _settingsPage ||
+                page == _savedProfilePage ||
+                page == _projectsProfilePage ||
+                page == _helpProfilePage ||
+                page == _settingsDetailPage);
     }
 
     private static void SetPageVisible(VisualElement page, bool visible)
@@ -264,6 +362,51 @@ public sealed class MainAppController : MonoBehaviour
 
         foreach (var savedId in _data.SavedFurnitureIds)
             _savedProfileList.Add(CreateSavedFurnitureListItem(FurnitureCatalog.Find(savedId)));
+    }
+
+    private void RenderHelpGuide()
+    {
+        if (_helpProfileList == null)
+            return;
+
+        _helpProfileList.Clear();
+        _helpProfileList.Add(CreateDetailInfoItem("Create a project", "Start from Home, name the room, then open the AR designer."));
+        _helpProfileList.Add(CreateDetailInfoItem("Place furniture", "Open Inventory in AR mode, choose saved furniture, then tap a detected surface."));
+        _helpProfileList.Add(CreateDetailInfoItem("Edit objects", "Select an item and use Move, Rotate, or Scale to adjust it in the room."));
+        _helpProfileList.Add(CreateDetailInfoItem("Save work", "Use the save button in AR mode so the project appears in My projects."));
+    }
+
+    private void ShowSettingsDetail(string title, string subtitle, params (string Title, string Body)[] items)
+    {
+        SetLabel(_settingsDetailTitleLabel, title);
+        SetLabel(_settingsDetailSubtitleLabel, subtitle);
+
+        if (_settingsDetailList != null)
+        {
+            _settingsDetailList.Clear();
+            foreach (var item in items)
+                _settingsDetailList.Add(CreateDetailInfoItem(item.Title, item.Body));
+        }
+
+        _showSavedOnly = false;
+        ShowPage(_settingsDetailPage);
+        SetActiveNav(null);
+    }
+
+    private static VisualElement CreateDetailInfoItem(string title, string body)
+    {
+        var item = new VisualElement();
+        item.AddToClassList("detail-info-item");
+
+        var titleLabel = new Label(title);
+        titleLabel.AddToClassList("detail-info-title");
+
+        var bodyLabel = new Label(body);
+        bodyLabel.AddToClassList("detail-info-body");
+
+        item.Add(titleLabel);
+        item.Add(bodyLabel);
+        return item;
     }
 
     private VisualElement CreateProjectCard(ProjectRecord project, bool showDelete)

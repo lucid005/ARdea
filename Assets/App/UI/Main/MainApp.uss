@@ -643,6 +643,30 @@
     -unity-font-style: bold;
 }
 
+.detail-info-item {
+    width: 920px;
+    margin-bottom: 22px;
+    padding: 26px;
+    background-color: var(--soft);
+    border-width: 1px;
+    border-color: var(--line);
+    border-radius: 18px;
+}
+
+.detail-info-title {
+    color: var(--ink);
+    font-size: 27px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.detail-info-body {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 24px;
+    white-space: normal;
+}
+
 .bottom-nav {
     position: absolute;
     left: 0;
